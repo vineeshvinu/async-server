@@ -1,0 +1,252 @@
+Vinus-iMac:~ vinu$  telnet localhost 8080
+Trying ::1...
+telnet: connect to address ::1: Connection refused
+Trying 127.0.0.1...
+Connected to localhost.
+Escape character is '^]'.
+ping
+S pong
+pinggg
+E Invalid command....
+ping 
+S pong
+pingping
+E Invalid command....
+cat 
+E No filename specified
+cat
+E Invalid command....
+sum
+E Invalid command....
+sum 
+S 0
+ping
+S pong
+sum 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 11 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 11 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 11 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 11 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 11 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 11 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+S 246
+Connection closed by foreign host.
+Vinus-iMac:~ vinu$  telnet localhost 8080
+Trying ::1...
+telnet: connect to address ::1: Connection refused
+Trying 127.0.0.1...
+Connected to localhost.
+Escape character is '^]'.
+ping
+ping
+ping
+cat ng.yaml
+sum 1 2 3 4 1
+S pong
+S pong
+
+S pong
+
+S apiVersion: v1
+kind: Pod
+metadata:
+  creationTimestamp: null
+  labels:
+    run: app
+  name: nginx
+spec:
+  containers:
+  - command:
+    - /bin/sh
+    - -c
+    - echo
+    - hello
+    env:
+    - name: HOST
+      value: locahost
+    image: nginx
+    name: nginx
+    ports:
+    - containerPort: 80
+    resources: 
+      requests:
+        cpu: 100m
+        memory: 200Mi  
+  dnsPolicy: ClusterFirst
+  restartPolicy: Always
+status: {}
+
+
+S 11
+
+E Invalid command....
+
+E Invalid command....
+
+E Invalid command....
+
+E Invalid command....
+ping
+ping
+ping
+cat ng.yaml
+sum 1 2 3 4 1
+S pong
+S pong
+S pong
+
+S apiVersion: v1
+kind: Pod
+metadata:
+  creationTimestamp: null
+  labels:
+    run: app
+  name: nginx
+spec:
+  containers:
+  - command:
+    - /bin/sh
+    - -c
+    - echo
+    - hello
+    env:
+    - name: HOST
+      value: locahost
+    image: nginx
+    name: nginx
+    ports:
+    - containerPort: 80
+    resources: 
+      requests:
+        cpu: 100m
+        memory: 200Mi  
+  dnsPolicy: ClusterFirst
+  restartPolicy: Always
+status: {}
+
+
+S 11
+
+E Invalid command....
+
+E Invalid command....
+ping
+S pong
+ping
+S pong
+ping
+
+ping
+
+ping
+
+cat ng.yaml
+
+sum 1 2 3 4 1
+
+S pong
+E Invalid command....
+
+S pong
+
+S pong
+
+S apiVersion: v1
+kind: Pod
+metadata:
+  creationTimestamp: null
+  labels:
+    run: app
+  name: nginx
+spec:
+  containers:
+  - command:
+    - /bin/sh
+    - -c
+    - echo
+    - hello
+    env:
+    - name: HOST
+      value: locahost
+    image: nginx
+    name: nginx
+    ports:
+    - containerPort: 80
+    resources: 
+      requests:
+        cpu: 100m
+        memory: 200Mi  
+  dnsPolicy: ClusterFirst
+  restartPolicy: Always
+status: {}
+
+
+S 11
+
+E Invalid command....
+
+E Invalid command....
+
+E Invalid command....
+
+E Invalid command....
+
+E Invalid command....
+
+E Invalid command....
+
+E Invalid command....
+ping
+
+ping
+
+ping
+
+cat ng.yaml
+
+sum 1 2 3 4 1
+
+S pong
+E Invalid command....
+S pong
+S pong
+
+S apiVersion: v1
+kind: Pod
+metadata:
+  creationTimestamp: null
+  labels:
+    run: app
+  name: nginx
+spec:
+  containers:
+  - command:
+    - /bin/sh
+    - -c
+    - echo
+    - hello
+    env:
+    - name: HOST
+      value: locahost
+    image: nginx
+    name: nginx
+    ports:
+    - containerPort: 80
+    resources: 
+      requests:
+        cpu: 100m
+        memory: 200Mi  
+  dnsPolicy: ClusterFirst
+  restartPolicy: Always
+status: {}
+
+
+S 11
+
+E Invalid command....
+s
+E Invalid command....
+cat
+E Invalid command....
+sum 
+S 0
+ping
+S pong
+
+E Invalid command....
+ping
+S pon

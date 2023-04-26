@@ -12,24 +12,34 @@ previous command).
 
 The solution should serve at least 10 clients at a time and should be based on libevent library.
 Incoming command format:
+```bash
 <COMMAND> <ARGUMENT 1> <ARGUMENT 2> … <ARGUMENT N>\n
+```
 The command and all arguments are separated by spaces. For simplicity, arguments can’t
 contain spaces.
 
 Answer format:
+```
 <STATUS> <ANSWER>\n
+```
 STATUS - a symbol indicating a result of the command:
+
 “S” - successful
+
 “E” - unsuccessful
-A status field and an answer field are separated by a space. The answer can contain any
+
+A status field and an answer field are separated by a space. 
+The answer can contain any
 number of spaces.
 
 supported commands:
-Ping command:
+1.Ping command:
 ping -> S pong
-File content output by name:
+
+2.File content output by name:
 cat <FILENAME> -> S <DATA> or E <comment> if there is no such file
-The sum of all parameters:
+
+3.The sum of all parameters:
 sum 1 2 3 … 4 5 (unlimited number of arguments) -> S <SUM>
   
 Run:
@@ -42,3 +52,19 @@ Execute command:
 ```bash
 telnet localhost 8080
 ```
+  
+ Examples:
+ ```
+telnet localhost 8080
+Trying 127.0.0.1...
+Connected to localhost.
+Escape character is '^]'.
+ping
+S pong
+ping
+S pong
+sum 1 2 3 4 1
+S 11
+cat hello.txt
+hello world!!!!!!
+ ```

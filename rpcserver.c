@@ -1,6 +1,6 @@
 /*
  *  Copyright 2023 @
- *  Please develop a server-side part of a client-server application that will execute commands from
+ *  A server-side part of a client-server application that will execute commands from
  *  a client. You may use any transport protocol (UDP/TCP) to transfer data but explain your choice.
  *  The program should receive commands from a client, execute them and return a result to the
  *  client. A client might send several commands sequentially (after receiving a result to the
@@ -14,6 +14,7 @@
 #include <arpa/inet.h>
 #include <string.h>
 #include <stdlib.h>
+#include <stdarg.h>
 #include <stdio.h>
 #include <fcntl.h>
 #include <unistd.h>
@@ -25,7 +26,31 @@
 /* Maximum connections allowed*/
 #define BACKLOGS 10
 
-int debug = 0; /* 1: enable, 0 disable*/
+/* Response buffer length */
+#define RESPONSE_BUF_LENGTH 30
+
+/* Command arguments length */
+#define MAX_ARGUMENTS 5
+
+/* Command length */
+#define CMD_LEN 4
+
+
+int debug = 1; /* 1: Enable, 0 Disable*/
+
+/*
+ * Function:  logs 
+ * --------------------
+ * Debug log support
+ * log - log string as input
+ *
+ * return: NA
+ */
+void debugPrint(int level, char *pclog)
+{
+  if (debug || level)
+    printf("debug: %s:%d -> %s\n", __FILE__, __LINE__,pclog);
+}
 
 /* client structure */
 struct client {
@@ -43,50 +68,33 @@ struct client {
  * return: 0 Success -1 Error
  */
 
-int setnonblock(int fd)
+int setnonblock(int ifd)
 {
   int iflags;
 
-  iflags = fcntl(fd, F_GETFL);
+  iflags = fcntl(ifd, F_GETFL);
   iflags |= O_NONBLOCK;
-  fcntl(fd, F_SETFL, iflags);
+  fcntl(ifd, F_SETFL, iflags);
   return 0;
 }
 
-/*
- * Function:  logs 
- * --------------------
- * Debug log support
- * log - log string as input
- *
- * return: NA
- */
-void logs(char *clog)
-{
-  if (debug)
-    printf("debug: %s\n", clog);
-}
-
-#define RESPONSE_BUF_LENGTH 30
-#define MAX_ARGUMENTS 5
-#define CMD_LEN 4
 /*
  * Function:  parse_command 
  * --------------------
  * handle sum command
  * pcReq : command argument string
- * arguments: list of arguments
+ * pcArguments: list of arguments
  * return: NA
  */
-int parse_command(char *pcReq, char *arguments[MAX_ARGUMENTS]) {
+int parse_command(char *pcReq, char *pcArguments[MAX_ARGUMENTS]) {
     char *pcToken;
     int iIndex = 0;
     pcToken = strtok(pcReq, " \n");
     while (pcToken != NULL && iIndex < MAX_ARGUMENTS) {
-        arguments[iIndex++] = pcToken;
+        pcArguments[iIndex++] = pcToken;
         pcToken = strtok(NULL, " \n");
     }
-    arguments[iIndex] = NULL;
+    pcArguments[iIndex] = NULL;
     return iIndex;
 }
 
@@ -102,7 +110,7 @@ void handle_ping_command(char *pcReq, char *pcResponse)
 {
   char *pcArguments[MAX_ARGUMENTS];
   int iArgC = parse_command(pcReq, pcArguments);
-  if (strcmp(pcArguments[0], "ping") == 0) 
+  if (!(strcmp(pcArguments[0], "ping")) && (1 == iArgC)) 
       sprintf(pcResponse, "S pong\n");
   else
       sprintf(pcResponse, "E Invalid command....\n");
@@ -119,12 +127,12 @@ void handle_ping_command(char *pcReq, char *pcResponse)
 void handle_cat_command(int iArgc, char *pcFilename, char *pcResponse, struct evbuffer *pstEvreturn)
 {
   if (iArgc < 2) {
-      sprintf(pcResponse, "E No filename specified\n");
+      sprintf(pcResponse, "E file name is required.\n");
       return;
   } else {
       FILE *fp = fopen(pcFilename, "r");
-      if (fp == NULL) {
-          sprintf(pcResponse, "E File not found\n");
+      if (NULL == fp) {
+          sprintf(pcResponse, "E No such file.\n");
       } else {
           /* Read file contents */
           char ch;
@@ -132,7 +140,7 @@ void handle_cat_command(int iArgc, char *pcFilename, char *pcResponse, struct ev
           pcResponse[iIndex++] = 'S';
           pcResponse[iIndex++] = ' ';
           while ((ch = fgetc(fp)) != EOF) {
-              if (iIndex >= RESPONSE_BUF_LENGTH - 3) { /* handle big size files*/
+              if (iIndex >= RESPONSE_BUF_LENGTH - 3) { /* handle large size files*/
                 pcResponse[iIndex] = '\0';
                 evbuffer_add_printf(pstEvreturn,"%s",pcResponse);
                 iIndex = 0;
@@ -186,7 +194,7 @@ void buf_read_callback(struct bufferevent *pstIncomingBufEvent, void *ctx)
 
     /* Read command buffer from client */
     pcReq = evbuffer_readline(pstIncomingBufEvent->input);
-    if (NULL == pcReq)
+    if (pcReq == NULL)
        return;
 
     pstEvreturn = evbuffer_new();
@@ -226,7 +234,7 @@ void buf_read_callback(struct bufferevent *pstIncomingBufEvent, void *ctx)
  */
 void buf_write_callback(struct bufferevent *pstBufEvent, void *pvArg)
 {
-  logs("Write buffer call.");
+  debugPrint(0, "Write buffer call.");
 }
 
 /*
@@ -240,7 +248,7 @@ void buf_write_callback(struct bufferevent *pstBufEvent, void *pvArg)
 void buf_error_callback(struct bufferevent *pstBufEvent, short shWhat, void *arg)
 {
   struct client *stClient = (struct client *)arg;
-  logs("Err buffer call.");
+  debugPrint(1, "Err buffer call.");
   /* free the resource */
   bufferevent_free(stClient->buf_ev);
   close(stClient->fd);
@@ -257,26 +265,29 @@ void buf_error_callback(struct bufferevent *pstBufEvent, short shWhat, void *arg
  */
 void accept_callback(int ifd, short shEv, void *arg)
 {
-  logs("Accepted the connection.");
+  debugPrint(0, "Accepted the connection.");
   int iclientFd;
   struct sockaddr_in stClient_addr;
-  socklen_t client_len = sizeof(stClient_addr);
+  socklen_t clientLen = sizeof(stClient_addr);
   struct client *pstClient;
 
   iclientFd = accept(ifd,
                      (struct sockaddr *)&stClient_addr,
-                     &client_len);
+                     &clientLen);
   if (iclientFd < 0)
-    {
-      warn("accept() failed.");
-      return;
-    }
+  {
+    debugPrint(1, "accept() failed.");
+    return;
+  }
 
   setnonblock(iclientFd);
 
   pstClient = calloc(1, sizeof(*pstClient));
-  if (pstClient == NULL)
-    err(1, "accept malloc failed.");
+  if (NULL == pstClient){
+    debugPrint(1, "accept mem alloc failed.");
+    return;
+  }
+
   pstClient->fd = iclientFd;
 
   pstClient->buf_ev = bufferevent_new(iclientFd,
@@ -327,6 +338,8 @@ int main()
     return 1;
   }
 
+  debugPrint(1, "Server starting....");
+
   if (listen(iSockListen, BACKLOGS) < 0)
   {
     fprintf(stderr,"Failed to listen to socket");
@@ -338,7 +351,7 @@ int main()
   /* Sets the socket to non-blocking */
   setnonblock(iSockListen);
 
-  /*  Constuct the new event structure */
+  /* Constuct the new event structure */
   event_set(&stAcceptEvent, iSockListen, EV_READ|EV_PERSIST,  accept_callback, NULL);
 
   /* Adds the event to the queue */

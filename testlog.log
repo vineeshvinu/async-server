@@ -1,4 +1,4 @@
-Vinus-iMac:~ vinu$  telnet localhost 8080
+root$  telnet localhost 8080
 Trying ::1...
 telnet: connect to address ::1: Connection refused
 Trying 127.0.0.1...
@@ -24,13 +24,6 @@ ping
 S pong
 sum 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 11 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 11 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 11 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 11 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 11 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 11 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
 S 246
-Connection closed by foreign host.
-Vinus-iMac:~ vinu$  telnet localhost 8080
-Trying ::1...
-telnet: connect to address ::1: Connection refused
-Trying 127.0.0.1...
-Connected to localhost.
-Escape character is '^]'.
 ping
 ping
 ping
@@ -38,9 +31,7 @@ cat ng.yaml
 sum 1 2 3 4 1
 S pong
 S pong
-
 S pong
-
 S apiVersion: v1
 kind: Pod
 metadata:
@@ -249,4 +240,4 @@ S pong
 
 E Invalid command....
 ping
-S pon
+S pong

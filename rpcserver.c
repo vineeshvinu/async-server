@@ -1,5 +1,4 @@
 /*
- *  Copyright 2023 @
  *  A server-side part of a client-server application that will execute commands from
  *  a client. You may use any transport protocol (UDP/TCP) to transfer data but explain your choice.
  *  The program should receive commands from a client, execute them and return a result to the

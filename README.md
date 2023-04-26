@@ -1,6 +1,11 @@
 # RPC-server
 A server-side part of a client-server application that will execute commands from
 a client. You may use any transport protocol (UDP/TCP) to transfer data but explain your choice.
+# Note
+*TCP is the transport protocol to transfer data. TCP provides reliable and ordered data transmission, 
+ensuring that data is not lost or duplicated during transmission. Additionally, TCP has a built-in flow control 
+mechanism that ensures that the server does not become overwhelmed with incoming connections.*
+
 The program should receive commands from a client, execute them and return a result to the
 client. A client might send several commands sequentially (after receiving a result to the
 previous command).

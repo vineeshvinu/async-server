@@ -109,11 +109,15 @@ int parse_command(char *pcReq, char *pcArguments[MAX_ARGUMENTS]) {
 void handle_ping_command(char *pcReq, char *pcResponse)
 {
   char *pcArguments[MAX_ARGUMENTS];
-  int iArgC = parse_command(pcReq, pcArguments);
-  if (!(strcmp(pcArguments[0], "ping")) && (1 == iArgC)) 
-      sprintf(pcResponse, "S pong\n");
-  else
-      sprintf(pcResponse, "E Invalid command....\n");
+  if (strlen(pcReq) < CMD_LEN + 1){
+    int iArgC = parse_command(pcReq, pcArguments);
+    if (!(strcmp(pcArguments[0], "ping")) && (1 == iArgC)){ 
+        sprintf(pcResponse, "S pong\n");
+        return;
+    }    
+  }
+  sprintf(pcResponse, "E Invalid command....\n");
+  return;
 }
 
 /*

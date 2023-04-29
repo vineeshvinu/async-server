@@ -26,7 +26,7 @@
 #define BACKLOGS 10
 
 /* Response buffer length */
-#define RESPONSE_BUF_LENGTH 30
+#define RESPONSE_BUF_LENGTH 1024
 
 /* Command arguments length */
 #define MAX_ARGUMENTS 5
@@ -106,7 +106,7 @@ int parse_command(char *pcReq, char *pcArguments[MAX_ARGUMENTS]) {
  * Function:  handle_sum_command 
  * --------------------
  * handle ping command
- * NA
+ * pcReq - input buffer 
  * response - response output buffer
  * return: NA
  */
@@ -289,7 +289,7 @@ void buf_error_callback(struct bufferevent *pstBufEvent, short shWhat, void *arg
  * Function:  accept_callback 
  * --------------------
  * Accept buffer callback
- * 
+ *  ifd - socket descriptor for the connection
  *
  * return: NA
  */

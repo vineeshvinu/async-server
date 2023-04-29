@@ -88,6 +88,11 @@ int setnonblock(int ifd)
 int parse_command(char *pcReq, char *pcArguments[MAX_ARGUMENTS]) {
     char *pcToken;
     int iIndex = 0;
+
+    /* validate i/p */
+    if (NULL == pcReq || NULL == pcArguments){
+      return 0;
+    }
     pcToken = strtok(pcReq, " \n");
     while (pcToken != NULL && iIndex < MAX_ARGUMENTS) {
         pcArguments[iIndex++] = pcToken;
@@ -108,6 +113,12 @@ int parse_command(char *pcReq, char *pcArguments[MAX_ARGUMENTS]) {
 void handle_ping_command(char *pcReq, char *pcResponse)
 {
   char *pcArguments[MAX_ARGUMENTS];
+  
+  /* validate i/p */
+  if (NULL == pcReq || NULL == pcResponse){
+      return;
+  }
+
   if (strlen(pcReq) < CMD_LEN + 1){
     int iArgC = parse_command(pcReq, pcArguments);
     if (!(strcmp(pcArguments[0], "ping")) && (1 == iArgC)){ 
@@ -129,6 +140,11 @@ void handle_ping_command(char *pcReq, char *pcResponse)
  */
 void handle_cat_command(int iArgc, char *pcFilename, char *pcResponse, struct evbuffer *pstEvreturn)
 {
+   /* validate i/p */
+  if (NULL == pcFilename || NULL == pcResponse || NULL == pstEvreturn){
+      return;
+  }
+
   if (iArgc < 2) {
       sprintf(pcResponse, "E file name is required.\n");
       return;
@@ -170,6 +186,12 @@ void handle_sum_command(char *pcReq, char *pcResponse)
 {
   char *pcToken;
   long sum=0;
+
+  /* validate i/p */
+  if (NULL == pcReq){
+      return;
+  }
+
   pcToken = strtok(pcReq, " \n");
   while (pcToken != NULL) {
       sum += atoi(pcToken);
@@ -194,6 +216,11 @@ void buf_read_callback(struct bufferevent *pstIncomingBufEvent, void *ctx)
     char *pcArguments[MAX_ARGUMENTS];
     int  iArgC;
     char *pcReq;
+
+    /* validate i/p */
+    if (NULL == pstIncomingBufEvent){
+      return;
+    }
 
     /* Read command buffer from client */
     pcReq = evbuffer_readline(pstIncomingBufEvent->input);

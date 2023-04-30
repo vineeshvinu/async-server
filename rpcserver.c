@@ -223,35 +223,37 @@ void buf_read_callback(struct bufferevent *pstIncomingBufEvent, void *ctx)
     }
 
     /* Read command buffer from client */
-    pcReq = evbuffer_readline(pstIncomingBufEvent->input);
-    if (pcReq == NULL)
-       return;
+    while(1){
+      pcReq = evbuffer_readline(pstIncomingBufEvent->input);
+      if (pcReq == NULL)
+         return;
 
-    pstEvreturn = evbuffer_new();
-        
-    /* Execute command */
-    if (strncmp(pcReq, "ping", CMD_LEN) == 0) {
-        /* Ping command */
-        handle_ping_command(pcReq, cResponse);
-    } else if (strncmp(pcReq, "cat ", CMD_LEN) == 0) {
-        /* Cat command */
-        iArgC = parse_command(pcReq, pcArguments);
-        handle_cat_command(iArgC, pcArguments[1], cResponse, pstEvreturn);
-    } else if (strncmp(pcReq, "sum ", CMD_LEN) == 0) {
-        /* Sum command */
-        handle_sum_command(pcReq, cResponse);  
-    } else {
-        /* Invalid command */
-        sprintf(cResponse, "E Invalid command....\n");
+      pstEvreturn = evbuffer_new();
+          
+      /* Execute command */
+      if (strncmp(pcReq, "ping", CMD_LEN) == 0) {
+          /* Ping command */
+          handle_ping_command(pcReq, cResponse);
+      } else if (strncmp(pcReq, "cat ", CMD_LEN) == 0) {
+          /* Cat command */
+          iArgC = parse_command(pcReq, pcArguments);
+          handle_cat_command(iArgC, pcArguments[1], cResponse, pstEvreturn);
+      } else if (strncmp(pcReq, "sum ", CMD_LEN) == 0) {
+          /* Sum command */
+          handle_sum_command(pcReq, cResponse);  
+      } else {
+          /* Invalid command */
+          sprintf(cResponse, "E Invalid command....\n");
+      }
+
+      /* Send response to client */
+      evbuffer_add_printf(pstEvreturn,"%s",cResponse);
+      bufferevent_write_buffer(pstIncomingBufEvent, pstEvreturn);
+
+      /* free the resource */
+      evbuffer_free(pstEvreturn);
+      free(pcReq);
     }
-
-    /* Send response to client */
-    evbuffer_add_printf(pstEvreturn,"%s",cResponse);
-    bufferevent_write_buffer(pstIncomingBufEvent, pstEvreturn);
-
-    /* free the resource */
-    evbuffer_free(pstEvreturn);
-    free(pcReq);
 }
 
 /*

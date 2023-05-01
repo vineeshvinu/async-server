@@ -6,7 +6,7 @@
  *  previous command).
  */
 
-#include "rpcserver.h"
+#include "async-server.h"
 
 /*
  * Function:  setnonblock 

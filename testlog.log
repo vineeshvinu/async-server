@@ -27,7 +27,7 @@ S 246
 ping
 ping
 ping
-cat ng.yaml
+cat testlog.log
 sum 1 2 3 4 1
 S pong
 S pong
@@ -74,7 +74,7 @@ E Invalid command....
 ping
 ping
 ping
-cat ng.yaml
+cat testlog.log
 sum 1 2 3 4 1
 S pong
 S pong
@@ -125,7 +125,7 @@ ping
 
 ping
 
-cat ng.yaml
+cat testlog.log
 
 sum 1 2 3 4 1
 
@@ -187,7 +187,7 @@ ping
 
 ping
 
-cat ng.yaml
+cat testlog.log
 
 sum 1 2 3 4 1
 

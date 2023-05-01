@@ -6,57 +6,7 @@
  *  previous command).
  */
 
-#include <event.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <string.h>
-#include <stdlib.h>
-#include <stdarg.h>
-#include <stdio.h>
-#include <fcntl.h>
-#include <unistd.h>
-#include <err.h>
-
-/* server port number*/
-#define SERVER_PORT 8080
-
-/* Maximum connections allowed*/
-#define BACKLOGS 10
-
-/* Response buffer length */
-#define RESPONSE_BUF_LENGTH 1024
-
-/* Command arguments length */
-#define MAX_ARGUMENTS 5
-
-/* Command length */
-#define CMD_LEN 4
-
-
-int debug = 1; /* 1: Enable, 0 Disable*/
-
-/*
- * Function:  logs 
- * --------------------
- * Debug log support
- * log - log string as input
- *
- * return: NA
- */
-void debugPrint(int level, char *pclog)
-{
-  if (debug || level)
-    printf("debug: %s:%d -> %s\n", __FILE__, __LINE__,pclog);
-}
-
-/* client structure */
-struct client {
-  int fd;
-  struct bufferevent *buf_ev;
-};
-
+#include "rpcserver.h"
 
 /*
  * Function:  setnonblock 
@@ -266,7 +216,7 @@ void buf_read_callback(struct bufferevent *pstIncomingBufEvent, void *ctx)
  */
 void buf_write_callback(struct bufferevent *pstBufEvent, void *pvArg)
 {
-  debugPrint(0, "Write buffer call.");
+  PRINT_DIAG("Write buffer call.");
 }
 
 /*
@@ -280,7 +230,7 @@ void buf_write_callback(struct bufferevent *pstBufEvent, void *pvArg)
 void buf_error_callback(struct bufferevent *pstBufEvent, short shWhat, void *arg)
 {
   struct client *stClient = (struct client *)arg;
-  debugPrint(1, "Err buffer call.");
+  PRINT_DIAG("Err buffer call.");
   /* free the resource */
   bufferevent_free(stClient->buf_ev);
   close(stClient->fd);
@@ -297,7 +247,7 @@ void buf_error_callback(struct bufferevent *pstBufEvent, short shWhat, void *arg
  */
 void accept_callback(int ifd, short shEv, void *arg)
 {
-  debugPrint(0, "Accepted the connection.");
+  PRINT_DIAG("Accepted the connection.");
   int iclientFd;
   struct sockaddr_in stClient_addr;
   socklen_t clientLen = sizeof(stClient_addr);
@@ -308,7 +258,7 @@ void accept_callback(int ifd, short shEv, void *arg)
                      &clientLen);
   if (iclientFd < 0)
   {
-    debugPrint(1, "accept() failed.");
+    PRINT_DIAG("accept() failed.");
     return;
   }
 
@@ -316,7 +266,7 @@ void accept_callback(int ifd, short shEv, void *arg)
 
   pstClient = calloc(1, sizeof(*pstClient));
   if (NULL == pstClient){
-    debugPrint(1, "accept mem alloc failed.");
+    PRINT_DIAG("accept mem alloc failed.");
     return;
   }
 
@@ -370,7 +320,7 @@ int main()
     return 1;
   }
 
-  debugPrint(1, "Server starting....");
+  PRINT_DIAG("Server starting....");
 
   if (listen(iSockListen, BACKLOGS) < 0)
   {

@@ -1,4 +1,4 @@
-# RPC-server
+# Async server
 A server-side part of a client-server application that will execute commands from
 a client. You may use any transport protocol (UDP/TCP) to transfer data but explain your choice.
 # Note
@@ -44,7 +44,7 @@ sum 1 2 3 … 4 5 (unlimited number of arguments) -> S <SUM>
   
 Run:
 ```bash
-gcc rpcserver.c -o server -levent
+gcc async-server.c -o server -levent
 ./server
 ```
   

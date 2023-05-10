@@ -9,30 +9,6 @@
 #include "async_server.h"
 
 /*
- * Function: resetInfo
- * --------------------
- *  clear all info context
- * info: info context
- * return: NA
- */
-void freeInfo(struct info *info, struct bufferevent *bev)
-{
-  struct evbuffer *buffer = bufferevent_get_input(bev);
-  info->cmd = 0;
-  if (info->data)
-  {
-    free(info->data);
-    info->data = NULL;
-  }
-  /* close the handle */
-  if (info->fd != -1)
-    close(info->fd);
-  info->fd = -1;
-  info->total_drained = 0;
-  evbuffer_drain(buffer, -1);
-}
-
-/*
  * Function: handle_cat_command
  * --------------------
  * handl cat command
@@ -43,11 +19,12 @@ void freeInfo(struct info *info, struct bufferevent *bev)
 void handle_cat_command(struct evbuffer *buffer, struct info *info, struct bufferevent *bev)
 {
   long length = evbuffer_get_length(buffer);
-  char *buf = (char *)evbuffer_pullup(buffer, length);
+  char *buf = (char *)evbuffer_pullup(buffer, length); // Get the file name
   buf[length - 2] = '\0';
   int fd = open(buf, O_RDONLY);
   if (fd < 0)
   {
+    /* If no such a file */
     bufferevent_write(bev, NO_SUCH_FILE, sizeof(NO_SUCH_FILE));
   }
   else
@@ -69,17 +46,6 @@ void handle_cat_command(struct evbuffer *buffer, struct info *info, struct buffe
  */
 int send_file(struct info *info, struct bufferevent *bev)
 {
-  // struct stat stats = {0};
-  // struct evbuffer *outBuf = bufferevent_get_output(bev);
-
-  // if (fstat(info->fd, &stats)<0) {
-	// 		/* Make sure the length still matches, now that we
-	// 		 * opened the file :/ */
-	// 		perror("fstat");
-	// 		return;
-	// 	}
-	// 	evbuffer_add_file(outBuf, info->fd, 0, stats.st_size);
-
   if (info->total_drained)
     lseek(info->fd, (size_t)info->total_drained, SEEK_SET);
 
@@ -116,6 +82,30 @@ int doSum(struct info *info, struct bufferevent *bev )
   evbuffer_add_printf(bufferevent_get_output(bev), "%lld\n", sum);
   sum=0;//clear sum
   return 0;
+}
+
+/*
+ * Function: resetInfo
+ * --------------------
+ *  clear all info context
+ * info: info context
+ * return: NA
+ */
+void freeInfo(struct info *info, struct bufferevent *bev)
+{
+  struct evbuffer *buffer = bufferevent_get_input(bev);
+  info->cmd = 0;
+  if (info->data)
+  {
+    free(info->data);
+    info->data = NULL;
+  }
+  /* close the handle */
+  if (info->fd != -1)
+    close(info->fd);
+  info->fd = -1;
+  info->total_drained = 0;
+  evbuffer_drain(buffer, -1);
 }
 
 /*

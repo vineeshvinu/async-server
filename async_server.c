@@ -69,8 +69,6 @@ void handle_cat_command(struct evbuffer *buffer, struct info *info, struct buffe
  */
 int send_file(struct info *info, struct bufferevent *bev)
 {
-  char *buf; /* Read buffer */
-  struct evbuffer *buffer = bufferevent_get_output(bev);
   // struct stat stats = {0};
   // struct evbuffer *outBuf = bufferevent_get_output(bev);
 
@@ -85,14 +83,38 @@ int send_file(struct info *info, struct bufferevent *bev)
   if (info->total_drained)
     lseek(info->fd, (size_t)info->total_drained, SEEK_SET);
 
-  int bytes = evbuffer_read(buffer, info->fd, MAX_LINE);
-  buf = (char *)evbuffer_pullup(buffer, bytes);
+  int bytes = evbuffer_read(bufferevent_get_output(bev), info->fd, MAX_LINE);
   if (bytes)
   {
-    bufferevent_write(bev, buf, bytes);
     info->total_drained += bytes;
     return bytes;
   }
+  return 0;
+}
+
+/*
+ * Function: send_file
+ * --------------------
+ * send file data
+ * buffer : info context
+ *  bev - buffer event
+ * return: NA
+ */
+int doSum(struct info *info, struct bufferevent *bev )
+{
+  char *pcToken;
+  static long long sum = 0;
+
+  pcToken = strtok(info->data + info->total_drained, " \n");
+  if (pcToken != NULL)
+  {
+    sum += atol(pcToken);
+    info->total_drained += strlen(pcToken) + 1; //space
+    bufferevent_write(bev, " \b", 2);
+    return 1;
+  }
+  evbuffer_add_printf(bufferevent_get_output(bev), "%lld\n", sum);
+  sum=0;//clear sum
   return 0;
 }
 
@@ -157,27 +179,10 @@ async_read_callback(struct bufferevent *bev, void *ctx)
   return;
 }
 
-void doSum(struct info *info, struct bufferevent *bev )
-{
-  char *pcToken;
-  long long sum = 0;
-  char buf[MAX_LINE];
-
-  pcToken = strtok(info->data, " \n");
-  while (pcToken != NULL)
-  {
-    sum += atol(pcToken);
-    pcToken = strtok(NULL, " \n");
-  }
-  int bytes = sprintf(buf, "%lld\n", sum);
-  bufferevent_write(bev, buf, bytes);
-  return;
-}
-
 /*
  * Function:  async_write_callback
  * --------------------
- *  write callback
+ * write callback
  * bev : buffer event
  * ctx: context
  * return: NA
@@ -200,7 +205,8 @@ async_write_callback(struct bufferevent *bev, void *ctx)
       break;
       
     case CMD_SUM:
-      doSum(info, bev);
+      if (doSum(info, bev))
+        return;
       break;
 
     default:

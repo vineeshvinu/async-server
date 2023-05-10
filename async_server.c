@@ -69,7 +69,8 @@ void handle_cat_command(struct evbuffer *buffer, struct info *info, struct buffe
  */
 int send_file(struct info *info, struct bufferevent *bev)
 {
-  char buf[MAX_LINE] = {0}; /* Read buffer */
+  char *buf; /* Read buffer */
+  struct evbuffer *buffer = bufferevent_get_output(bev);
   // struct stat stats = {0};
   // struct evbuffer *outBuf = bufferevent_get_output(bev);
 
@@ -84,7 +85,8 @@ int send_file(struct info *info, struct bufferevent *bev)
   if (info->total_drained)
     lseek(info->fd, (size_t)info->total_drained, SEEK_SET);
 
-  int bytes = read(info->fd, buf, sizeof(buf));
+  int bytes = evbuffer_read(buffer, info->fd, MAX_LINE);
+  buf = (char *)evbuffer_pullup(buffer, bytes);
   if (bytes)
   {
     bufferevent_write(bev, buf, bytes);
